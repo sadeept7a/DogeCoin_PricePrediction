@@ -2,8 +2,9 @@ streamlit
 tensorflow
 numpy
 pandas
-scikit-learn
+scikit-learn==1.6.1
 joblib
 plotly
-yfinance>=0.2.57
-curl_cffi
+
+yfinance==0.2.62
+curl_cffi>=0.11.1

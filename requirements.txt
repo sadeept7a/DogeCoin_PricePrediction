@@ -5,5 +5,5 @@ pandas
 scikit-learn==1.6.1
 joblib
 plotly
-yfinance>=0.2.50
+yfinance==0.2.50
 requests

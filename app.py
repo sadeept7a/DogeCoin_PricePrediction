@@ -51,13 +51,16 @@ def load_artifacts(artifacts_dir: str = "doge_deploy_artifacts"):
 # -----------------------------
 @st.cache_data(ttl=60 * 60)
 def fetch_doge_data(period: str = "5y", interval: str = "1d") -> pd.DataFrame:
-    # CHANGE: Use standard requests instead of curl_cffi
+    # Use a standard requests Session with a browser User-Agent
     session = requests.Session()
-    session.headers.update({
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    })
+    session.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
+    )
 
     try:
+        # With yfinance==0.2.50, this session object is accepted
         df = yf.download(
             "DOGE-USD",
             period=period,
@@ -76,7 +79,6 @@ def fetch_doge_data(period: str = "5y", interval: str = "1d") -> pd.DataFrame:
     df = df.reset_index()
     df.columns = [str(c).strip() for c in df.columns]
     return df
-
 
 
 # -----------------------------

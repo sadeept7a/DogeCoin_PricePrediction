@@ -50,8 +50,11 @@ def load_artifacts(artifacts_dir: str = "doge_deploy_artifacts"):
 # Live fetch DOGE-USD from Yahoo Finance
 # -----------------------------
 @st.cache_data(ttl=60 * 60)
-def fetch_doge_data(period="5y", interval="1d"):
-    session = curl_requests.Session(impersonate="chrome")  # not chrome136
+def fetch_doge_data(period: str = "5y", interval: str = "1d") -> pd.DataFrame:
+    # Force a supported impersonation target.
+    # "chrome" maps to the latest supported target in your curl_cffi build.
+    session = curl_requests.Session(impersonate="chrome")
+
     df = yf.download(
         "DOGE-USD",
         period=period,
@@ -60,9 +63,14 @@ def fetch_doge_data(period="5y", interval="1d"):
         progress=False,
         session=session,
     )
+
+    if df is None or df.empty:
+        return pd.DataFrame()
+
     df = df.reset_index()
     df.columns = [str(c).strip() for c in df.columns]
     return df
+
 
 
 # -----------------------------

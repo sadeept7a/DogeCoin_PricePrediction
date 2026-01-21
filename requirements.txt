@@ -7,4 +7,4 @@ joblib
 plotly
 
 yfinance==0.2.62
-curl_cffi>=0.11.1
+curl_cffi>=0.14.0

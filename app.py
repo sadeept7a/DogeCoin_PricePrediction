@@ -9,7 +9,7 @@ import streamlit as st
 import tensorflow as tf
 import yfinance as yf
 import plotly.graph_objects as go
-from curl_cffi import requests as curl_requests
+import requests
 
 
 # -----------------------------
@@ -51,18 +51,24 @@ def load_artifacts(artifacts_dir: str = "doge_deploy_artifacts"):
 # -----------------------------
 @st.cache_data(ttl=60 * 60)
 def fetch_doge_data(period: str = "5y", interval: str = "1d") -> pd.DataFrame:
-    # Force a supported impersonation target.
-    # "chrome" maps to the latest supported target in your curl_cffi build.
-    session = curl_requests.Session(impersonate="chrome110")
+    # CHANGE: Use standard requests instead of curl_cffi
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    })
 
-    df = yf.download(
-        "DOGE-USD",
-        period=period,
-        interval=interval,
-        auto_adjust=False,
-        progress=False,
-        session=session,
-    )
+    try:
+        df = yf.download(
+            "DOGE-USD",
+            period=period,
+            interval=interval,
+            auto_adjust=False,
+            progress=False,
+            session=session,
+        )
+    except Exception as e:
+        st.error(f"Yahoo Finance download failed: {e}")
+        return pd.DataFrame()
 
     if df is None or df.empty:
         return pd.DataFrame()

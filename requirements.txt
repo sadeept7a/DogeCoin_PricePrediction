@@ -4,5 +4,6 @@ numpy
 pandas
 scikit-learn
 joblib
-yfinance
 plotly
+yfinance>=0.2.57
+curl_cffi

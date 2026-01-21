@@ -9,6 +9,7 @@ import streamlit as st
 import tensorflow as tf
 import yfinance as yf
 import plotly.graph_objects as go
+from curl_cffi import requests as curl_requests
 
 
 # -----------------------------
@@ -48,34 +49,20 @@ def load_artifacts(artifacts_dir: str = "doge_deploy_artifacts"):
 # -----------------------------
 # Live fetch DOGE-USD from Yahoo Finance
 # -----------------------------
-@st.cache_data(ttl=60 * 60)  # cache for 1 hour
-def fetch_doge_data(period: str = "5y", interval: str = "1d") -> pd.DataFrame:
+@st.cache_data(ttl=60 * 60)
+def fetch_doge_data(period="5y", interval="1d"):
+    session = curl_requests.Session(impersonate="chrome")  # not chrome136
     df = yf.download(
         "DOGE-USD",
         period=period,
         interval=interval,
         auto_adjust=False,
         progress=False,
-        group_by="column",   # helps avoid some MultiIndex cases
-        threads=True,
+        session=session,
     )
-
-    # If yfinance returns MultiIndex columns, flatten them
-    if isinstance(df.columns, pd.MultiIndex):
-        df.columns = [
-            "_".join([str(x) for x in col if x is not None and str(x) != ""])
-            for col in df.columns.to_list()
-        ]
-    else:
-        df.columns = [str(c) for c in df.columns]
-
-    # Clean column names
-    df.columns = [c.strip() for c in df.columns]
-
     df = df.reset_index()
-
+    df.columns = [str(c).strip() for c in df.columns]
     return df
-
 
 
 # -----------------------------

@@ -1,0 +1,13 @@
+{
+  "sequence_length": 60,
+  "features": [
+    "Open",
+    "High",
+    "Low",
+    "Close",
+    "Volume",
+    "MA7",
+    "MA30"
+  ],
+  "close_index": 3
+}

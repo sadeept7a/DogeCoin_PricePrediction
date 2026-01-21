@@ -9,7 +9,6 @@ import streamlit as st
 import tensorflow as tf
 import yfinance as yf
 import plotly.graph_objects as go
-import requests
 
 
 # -----------------------------

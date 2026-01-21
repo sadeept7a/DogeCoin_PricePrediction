@@ -51,23 +51,15 @@ def load_artifacts(artifacts_dir: str = "doge_deploy_artifacts"):
 # -----------------------------
 @st.cache_data(ttl=60 * 60)
 def fetch_doge_data(period: str = "5y", interval: str = "1d") -> pd.DataFrame:
-    # Use a standard requests Session with a browser User-Agent
-    session = requests.Session()
-    session.headers.update(
-        {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        }
-    )
-
     try:
-        # With yfinance==0.2.50, this session object is accepted
+        # Let yfinance handle session/headers internally.
+        # This avoids the JSONDecodeError caused by manual session conflicts.
         df = yf.download(
-            "DOGE-USD",
+            tickers="DOGE-USD",
             period=period,
             interval=interval,
             auto_adjust=False,
             progress=False,
-            session=session,
         )
     except Exception as e:
         st.error(f"Yahoo Finance download failed: {e}")
@@ -77,6 +69,12 @@ def fetch_doge_data(period: str = "5y", interval: str = "1d") -> pd.DataFrame:
         return pd.DataFrame()
 
     df = df.reset_index()
+
+    # CRITICAL: Flatten Multi-Index columns (e.g., ('Close', 'DOGE-USD') -> 'Close')
+    # Newer yfinance versions often return Multi-Index headers which break feature engineering.
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.get_level_values(0)
+
     df.columns = [str(c).strip() for c in df.columns]
     return df
 

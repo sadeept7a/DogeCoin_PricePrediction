@@ -53,7 +53,7 @@ def load_artifacts(artifacts_dir: str = "doge_deploy_artifacts"):
 def fetch_doge_data(period: str = "5y", interval: str = "1d") -> pd.DataFrame:
     # Force a supported impersonation target.
     # "chrome" maps to the latest supported target in your curl_cffi build.
-    session = curl_requests.Session(impersonate="chrome")
+    session = curl_requests.Session(impersonate="chrome110")
 
     df = yf.download(
         "DOGE-USD",
